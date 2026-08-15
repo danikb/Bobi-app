@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>בובי 🐾</title>
+<style>
+  :root {
+    --cream: #FAF6EF;
+    --ink: #2B2420;
+    --clay: #C67B5C;
+    --moss: #6B7A5E;
+    --sky: #7A97A3;
+    --gold: #D4A24C;
+    --line: #E4DCCC;
+    --card: #FFFFFF;
+    --danger: #B85C4A;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    padding-bottom: 90px;
+  }
+  .header {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 28px 20px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: "";
+    position: absolute;
+    right: -30px;
+    top: -30px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--clay) 0%, transparent 70%);
+    opacity: 0.35;
+  }
+  .header h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; position: relative; }
+  .header .sub { font-size: 14px; opacity: 0.7; margin-top: 4px; position: relative; }
+  .age-badge {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-top: 10px;
+    position: relative;
+  }
+
+  .setup-banner {
+    background: #FBF1EC;
+    border-bottom: 1px solid var(--danger);
+    padding: 12px 16px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .setup-banner input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    margin-top: 8px;
+    font-size: 13px;
+    direction: ltr;
+    text-align: left;
+  }
+  .setup-banner button {
+    margin-top: 8px;
+    padding: 10px 16px;
+    background: var(--ink);
+    color: var(--cream);
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .tabs {
+    display: flex;
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .tab {
+    flex: 1;
+    padding: 14px 4px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #9a9187;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+  }
+  .tab.active { color: var(--ink); border-bottom-color: var(--clay); }
+
+  .content { padding: 18px 16px; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .quick-btn {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px 10px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: transform 0.1s;
+  }
+  .quick-btn:active { transform: scale(0.96); }
+  .quick-btn .icon { font-size: 26px; }
+  .quick-btn.pee { border-color: var(--sky); }
+  .quick-btn.poop { border-color: #8B6F47; }
+  .quick-btn.food { border-color: var(--gold); }
+  .quick-btn.accident { border-color: var(--danger); background: #FBF1EF; }
+  .quick-btn:disabled { opacity: 0.4; }
+
+  .section-title { font-size: 15px; font-weight: 800; margin: 22px 0 10px; }
+
+  .stat-row { display: flex; gap: 10px; margin-bottom: 4px; }
+  .stat-card { flex: 1; background: var(--card); border-radius: 14px; padding: 12px; text-align: center; border: 1px solid var(--line); }
+  .stat-card .num { font-size: 22px; font-weight: 800; color: var(--clay); }
+  .stat-card .lbl { font-size: 11px; color: #8a8177; margin-top: 2px; }
+
+  .log-item {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--line);
+  }
+  .log-item .emoji { font-size: 22px; }
+  .log-item .info { flex: 1; }
+  .log-item .info .type { font-weight: 700; font-size: 14px; }
+  .log-item .info .meta { font-size: 12px; color: #8a8177; margin-top: 1px; }
+  .log-item .who { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 10px; background: var(--cream); color: var(--ink); }
+  .log-item .del { color: #c4bcae; font-size: 18px; cursor: pointer; padding: 4px; }
+
+  .empty-state { text-align: center; padding: 30px 20px; color: #a89f93; font-size: 13px; }
+
+  .goal-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin-bottom: 10px; }
+  .goal-card .goal-top { display: flex; align-items: center; gap: 10px; }
+  .goal-check {
+    width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line);
+    flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; transition: all 0.15s;
+  }
+  .goal-check.done { background: var(--moss); border-color: var(--moss); color: white; }
+  .goal-card .goal-text { flex: 1; }
+  .goal-card .goal-title { font-weight: 700; font-size: 14px; }
+  .goal-card .goal-title.done { text-decoration: line-through; opacity: 0.5; }
+  .goal-card .goal-desc { font-size: 12px; color: #8a8177; margin-top: 2px; }
+  .goal-card .goal-week { font-size: 10px; color: var(--sky); font-weight: 700; margin-top: 4px; }
+
+  .week-pill {
+    display: inline-flex; align-items: center; gap: 6px; background: var(--ink); color: var(--cream);
+    font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 20px; margin-bottom: 12px;
+  }
+
+  .schedule-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .schedule-item:last-child { border-bottom: none; }
+  .schedule-time { font-weight: 800; font-size: 14px; color: var(--clay); width: 52px; flex-shrink: 0; }
+  .schedule-item .desc { font-size: 13px; flex: 1; }
+
+  .fab-row {
+    position: fixed; bottom: 0; left: 0; right: 0; background: var(--card);
+    border-top: 1px solid var(--line); padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    display: flex; gap: 8px; z-index: 20;
+  }
+  .who-btn { flex: 1; padding: 12px; border-radius: 14px; border: 2px solid var(--line); background: var(--cream); font-weight: 700; font-size: 13px; cursor: pointer; }
+  .who-btn.active-dror { border-color: var(--sky); background: #EAF1F3; }
+  .who-btn.active-revital { border-color: var(--clay); background: #FBF1EC; }
+
+  .toast {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
+    background: var(--ink); color: var(--cream); padding: 12px 20px; border-radius: 30px;
+    font-size: 14px; font-weight: 700; z-index: 100; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2); max-width: 90%; text-align: center;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .sync-dot {
+    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    background: #8a8177; margin-left: 6px; vertical-align: middle;
+  }
+  .sync-dot.ok { background: var(--moss); }
+  .sync-dot.busy { background: var(--gold); animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { opacity: 0.3; } }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="setup-banner" id="setupBanner" style="display:none;">
+  <b>הגדרה חד-פעמית:</b> הדבק כאן את כתובת ה-Web App שקיבלת מ-Google Apps Script (ה-URL שמסתיים ב-/exec):
+  <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
+  <button onclick="saveScriptUrl()">שמור והתחבר</button>
+</div>
+
+<div class="header">
+  <h1>בובי 🐩</h1>
+  <div class="sub">היומן המשותף של דניאל ורויטל <span class="sync-dot" id="syncDot"></span></div>
+  <div class="age-badge" id="ageBadge">מחשב גיל...</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-view="home">היום</div>
+  <div class="tab" data-view="training">אילוף</div>
+  <div class="tab" data-view="social">סוציאליזציה</div>
+  <div class="tab" data-view="health">בריאות</div>
+  <div class="tab" data-view="schedule">לו"ז</div>
+</div>
+
+<div class="content">
+  <div class="view active" id="view-home">
+    <div class="quick-grid">
+      <div class="quick-btn pee" onclick="logEvent('pee')"><span class="icon">💧</span> עשה פיפי</div>
+      <div class="quick-btn poop" onclick="logEvent('poop')"><span class="icon">💩</span> עשה קקי</div>
+      <div class="quick-btn food" onclick="logEvent('food')"><span class="icon">🍖</span> אכל</div>
+      <div class="quick-btn accident" onclick="logEvent('accident')"><span class="icon">⚠️</span> תאונה בבית</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-card"><div class="num" id="statSuccess">0</div><div class="lbl">יציאות מוצלחות היום</div></div>
+      <div class="stat-card"><div class="num" id="statAccidents">0</div><div class="lbl">תאונות היום</div></div>
+      <div class="stat-card"><div class="num" id="statMeals">0</div><div class="lbl">ארוחות היום</div></div>
+    </div>
+    <div class="section-title">היומן של היום</div>
+    <div id="todayLog"></div>
+
+    <div id="photosLinkWrap"></div>
+  </div>
+
+  <div class="view" id="view-training">
+    <div class="week-pill" id="weekPill">שבוע X</div>
+    <div id="trainingGoals"></div>
+  </div>
+
+  <div class="view" id="view-social">
+    <div class="week-pill">חלון הסוציאליזציה הקריטי: שבועות 3–14</div>
+    <div id="socialGoals"></div>
+  </div>
+
+  <div class="view" id="view-health">
+    <div class="section-title">תזכורות קרובות</div>
+    <div id="healthUpcoming"></div>
+
+    <div class="section-title">הוספת רישום</div>
+    <div class="goal-card">
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <input type="text" id="healthTitle" placeholder="לדוגמה: חיסון משושה, ביקור וטרינר שגרתי" style="padding:10px; border-radius:10px; border:1px solid var(--line); font-size:14px;">
+        <select id="healthCategory" style="padding:10px; border-radius:10px; border:1px solid var(--line); font-size:14px;">
+          <option value="vaccine">חיסון</option>
+          <option value="vet">ביקור וטרינר</option>
+          <option value="medication">תרופה/טיפול</option>
+          <option value="other">אחר</option>
+        </select>
+        <input type="date" id="healthDate" style="padding:10px; border-radius:10px; border:1px solid var(--line); font-size:14px;">
+        <label style="display:flex; align-items:center; gap:8px; font-size:13px;">
+          <input type="checkbox" id="healthIsFuture" style="width:18px; height:18px;"> זו תזכורת לביקור עתידי (עדיין לא קרה)
+        </label>
+        <input type="text" id="healthNotes" placeholder="הערות (לא חובה)" style="padding:10px; border-radius:10px; border:1px solid var(--line); font-size:14px;">
+        <button onclick="addHealthEntry()" style="padding:12px; background:var(--ink); color:var(--cream); border:none; border-radius:12px; font-weight:700; font-size:14px; cursor:pointer;">הוסף רישום</button>
+      </div>
+    </div>
+
+    <div class="section-title">היסטוריה</div>
+    <div id="healthHistory"></div>
+  </div>
+
+  <div class="view" id="view-schedule">
+    <div class="section-title">לוח יום מומלץ לגיל 8 שבועות</div>
+    <div class="goal-card">
+      <div class="schedule-item"><div class="schedule-time">07:00</div><div class="desc">יקיצה → החוצה מיד לפיפי</div></div>
+      <div class="schedule-item"><div class="schedule-time">07:15</div><div class="desc">ארוחת בוקר</div></div>
+      <div class="schedule-item"><div class="schedule-time">07:35</div><div class="desc">החוצה שוב (20 דק' אחרי אוכל)</div></div>
+      <div class="schedule-item"><div class="schedule-time">08:00</div><div class="desc">משחק/אימון קצר (5 דק')</div></div>
+      <div class="schedule-item"><div class="schedule-time">08:30</div><div class="desc">שינה</div></div>
+      <div class="schedule-item"><div class="schedule-time">10:30</div><div class="desc">החוצה + ארוחה</div></div>
+      <div class="schedule-item"><div class="schedule-time">11:00</div><div class="desc">משחק/סוציאליזציה</div></div>
+      <div class="schedule-item"><div class="schedule-time">12:00</div><div class="desc">שינה</div></div>
+      <div class="schedule-item"><div class="schedule-time">14:00</div><div class="desc">החוצה + ארוחה</div></div>
+      <div class="schedule-item"><div class="schedule-time">14:30</div><div class="desc">אימון קצר</div></div>
+      <div class="schedule-item"><div class="schedule-time">15:30</div><div class="desc">שינה</div></div>
+      <div class="schedule-item"><div class="schedule-time">17:30</div><div class="desc">החוצה + משחק</div></div>
+      <div class="schedule-item"><div class="schedule-time">18:30</div><div class="desc">ארוחה + החוצה</div></div>
+      <div class="schedule-item"><div class="schedule-time">20:00</div><div class="desc">אימון/סוציאליזציה שקטה</div></div>
+      <div class="schedule-item"><div class="schedule-time">21:30</div><div class="desc">החוצה אחרון + שינה</div></div>
+      <div class="schedule-item"><div class="schedule-time">02:00</div><div class="desc">*יציאת לילה (עד גיל ~3-4 חודשים)</div></div>
+    </div>
+    <div class="section-title">כללי אצבע</div>
+    <div class="goal-card">
+      <div style="font-size:13px; line-height:1.9;">
+        🕐 <b>יציאה החוצה:</b> מיד ביקיצה, 15-20 דק׳ אחרי אוכל/שתייה, ואחרי כל משחק אינטנסיבי<br>
+        🍽️ <b>אוכל:</b> 3-4 ארוחות ביום בשעות קבועות<br>
+        😴 <b>שינה:</b> גור בגיל הזה צריך 18-20 שעות שינה ביממה - אל תעירו אותו<br>
+        🚫 <b>תאונה בבית:</b> אל תצעקו/תענישו - רק נקו בשקט וחזקו יציאה נכונה בפעם הבאה
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="fab-row">
+  <button class="who-btn active-dror" id="whoDror" onclick="setWho('דניאל')">👤 דניאל</button>
+  <button class="who-btn" id="whoRevital" onclick="setWho('רויטל')">👤 רויטל</button>
+</div>
+
+<script>
+const PUPPY_BIRTHDATE = new Date();
+PUPPY_BIRTHDATE.setDate(PUPPY_BIRTHDATE.getDate() - 56);
+
+let SCRIPT_URL = localStorage.getItem('bobby_script_url') || 'https://script.google.com/macros/s/AKfycbxwG7zYr9xxJ8XFdopa-LKIn6EMKZoieTC_6M_y-T9wRyenbOVjSENsqhUW2CmIWN1gvw/exec';
+let currentWho = localStorage.getItem('bobby_who') || 'דניאל';
+let events = [];
+let trainingProgress = {};
+let socialProgress = {};
+let healthEntries = [];
+let photosUrl = localStorage.getItem('bobby_photos_url') || 'https://photos.app.goo.gl/uEpxGRQGPYSew2Yc8';
+let isSyncing = false;
+
+const TRAINING_GOALS = [
+  {id:'t1', week:1, title:'שם הכלב', desc:'תגובה לשם תוך יום-יומיים, עם חיזוק חיובי מיידי'},
+  {id:'t2', week:1, title:'מקום לישון', desc:'לימוד שהמיטה/הלול הוא מקום בטוח וטוב'},
+  {id:'t3', week:1, title:'ישיבה בסיסית', desc:'עם פינוק, 2-3 פעמים ביום, 2 דק׳ כל פעם'},
+  {id:'t4', week:2, title:'"בוא" קליל', desc:'תרגול בתוך הבית במרחק קצר, תמיד עם תגמול'},
+  {id:'t5', week:2, title:'לא נשיכת ידיים', desc:'החלפה מיידית לצעצוע כשיש נשיכה, בלי ענישה'},
+  {id:'t6', week:3, title:'הישארות רגועה בלול', desc:'לבד לזמן קצר, בהדרגה, בלי דרמה בכניסה/יציאה'},
+  {id:'t7', week:3, title:'הרגלי רצועה', desc:'התרגלות לרצועה וקולר בבית, לפני יציאות לחוץ'},
+  {id:'t8', week:4, title:'"עצור/חכה"', desc:'לפני האוכל, שניות בודדות בהתחלה'},
+];
+
+const SOCIAL_GOALS = [
+  {id:'s1', title:'מפגש עם 3 אנשים חדשים', desc:'גילאים/מראות שונים, בקצב של הכלב'},
+  {id:'s2', title:'חשיפה לרעשי בית', desc:'שואב אבק, מייבש שיער, פעמון דלת - מרחוק ובעדינות'},
+  {id:'s3', title:'הליכה על משטחים שונים', desc:'שטיח, אריחים, דשא, מדרגה נמוכה'},
+  {id:'s4', title:'נסיעה קצרה ברכב', desc:'כמה דקות, ללא מתח, עם משהו מוכר'},
+  {id:'s5', title:'מפגש עם כלב מבוגר מחוסן', desc:'רגוע ומאולף, בשטח ניטרלי'},
+  {id:'s6', title:'הרגלה למברשת ולנגיעה בכפות', desc:'הכנה לטיפוח/וטרינר עתידי'},
+  {id:'s7', title:'חשיפה לרחוב (בזרועות/עגלה)', desc:'לפני חיסונים מלאים - לא על הרצפה בחוץ'},
+  {id:'s8', title:'שהייה לבד בחדר לכמה דקות', desc:'מניעת חרדת נטישה מוקדמת'},
+];
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+function setSyncDot(state) {
+  const dot = document.getElementById('syncDot');
+  dot.className = 'sync-dot ' + state;
+}
+
+function saveScriptUrl() {
+  const url = document.getElementById('scriptUrlInput').value.trim();
+  if (!url.startsWith('https://script.google.com/')) {
+    showToast('זה לא נראה כמו כתובת Apps Script תקינה');
+    return;
+  }
+  SCRIPT_URL = url;
+  localStorage.setItem('bobby_script_url', url);
+  document.getElementById('setupBanner').style.display = 'none';
+  loadData();
+}
+
+async function apiGet(action) {
+  const res = await fetch(`${SCRIPT_URL}?action=${action}`);
+  return res.json();
+}
+
+async function apiPost(payload) {
+  const res = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+  return res.json();
+}
+
+function setWho(name) {
+  currentWho = name;
+  localStorage.setItem('bobby_who', name);
+  document.getElementById('whoDror').classList.toggle('active-dror', name === 'דניאל');
+  document.getElementById('whoRevital').classList.toggle('active-revital', name === 'רויטל');
+}
+
+async function logEvent(type) {
+  if (!SCRIPT_URL) { showToast('קודם צריך להגדיר חיבור ל-Google Sheet'); return; }
+  const now = new Date();
+  const tempEvent = { id: 'temp'+now.getTime(), type, who: currentWho, timestamp: now.toISOString() };
+  events.unshift(tempEvent);
+  renderHome();
+  const labels = {pee:'פיפי נרשם 💧', poop:'קקי נרשם 💩', food:'ארוחה נרשמה 🍖', accident:'תאונה נרשמה - זה בסדר 💪'};
+  showToast(labels[type]);
+  setSyncDot('busy');
+  try {
+    const result = await apiPost({action:'addEvent', data: tempEvent});
+    tempEvent.id = result.id;
+    setSyncDot('ok');
+  } catch(e) {
+    setSyncDot('');
+    showToast('שגיאת סנכרון - בדוק חיבור');
+  }
+}
+
+async function deleteEvent(id) {
+  events = events.filter(e => e.id !== id);
+  renderHome();
+  setSyncDot('busy');
+  try {
+    await apiPost({action:'deleteEvent', id});
+    setSyncDot('ok');
+  } catch(e) { setSyncDot(''); }
+}
+
+function isToday(isoStr) {
+  const d = new Date(isoStr);
+  const now = new Date();
+  return d.toDateString() === now.toDateString();
+}
+function formatTime(isoStr) {
+  return new Date(isoStr).toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'});
+}
+
+function renderHome() {
+  const todayEvents = events.filter(e => isToday(e.timestamp));
+  document.getElementById('statSuccess').textContent = todayEvents.filter(e => e.type==='pee'||e.type==='poop').length;
+  document.getElementById('statAccidents').textContent = todayEvents.filter(e => e.type==='accident').length;
+  document.getElementById('statMeals').textContent = todayEvents.filter(e => e.type==='food').length;
+
+  const icons = {pee:'💧', poop:'💩', food:'🍖', accident:'⚠️'};
+  const labels = {pee:'פיפי בחוץ', poop:'קקי בחוץ', food:'ארוחה', accident:'תאונה בבית'};
+
+  const logDiv = document.getElementById('todayLog');
+  if (todayEvents.length === 0) {
+    logDiv.innerHTML = '<div class="empty-state">עדיין אין רישומים היום 🐾<br>לחצו על אחד הכפתורים למעלה</div>';
+    return;
+  }
+  logDiv.innerHTML = todayEvents.map(e => `
+    <div class="log-item">
+      <div class="emoji">${icons[e.type]}</div>
+      <div class="info"><div class="type">${labels[e.type]}</div><div class="meta">${formatTime(e.timestamp)}</div></div>
+      <div class="who">${e.who}</div>
+      <div class="del" onclick="deleteEvent('${e.id}')">✕</div>
+    </div>`).join('');
+}
+
+function getPuppyAgeWeeks() {
+  return Math.floor((new Date() - PUPPY_BIRTHDATE) / (1000*60*60*24*7));
+}
+function renderAgeBadge() {
+  document.getElementById('ageBadge').textContent = `בערך ${getPuppyAgeWeeks()} שבועות`;
+}
+
+function renderTraining() {
+  document.getElementById('weekPill').textContent = `שלב נוכחי: שבוע ${getPuppyAgeWeeks()} בבית`;
+  document.getElementById('trainingGoals').innerHTML = TRAINING_GOALS.map(g => {
+    const done = !!trainingProgress[g.id];
+    return `<div class="goal-card"><div class="goal-top">
+      <div class="goal-check ${done?'done':''}" onclick="toggleTraining('${g.id}')">${done?'✓':''}</div>
+      <div class="goal-text"><div class="goal-title ${done?'done':''}">${g.title}</div>
+      <div class="goal-desc">${g.desc}</div><div class="goal-week">שבוע מומלץ: ${g.week}</div></div>
+    </div></div>`;
+  }).join('');
+}
+
+function renderSocial() {
+  document.getElementById('socialGoals').innerHTML = SOCIAL_GOALS.map(g => {
+    const done = !!socialProgress[g.id];
+    return `<div class="goal-card"><div class="goal-top">
+      <div class="goal-check ${done?'done':''}" onclick="toggleSocial('${g.id}')">${done?'✓':''}</div>
+      <div class="goal-text"><div class="goal-title ${done?'done':''}">${g.title}</div>
+      <div class="goal-desc">${g.desc}</div></div>
+    </div></div>`;
+  }).join('');
+}
+
+async function toggleTraining(id) {
+  trainingProgress[id] = !trainingProgress[id];
+  renderTraining();
+  setSyncDot('busy');
+  try { await apiPost({action:'toggleTraining', id, done: trainingProgress[id]}); setSyncDot('ok'); }
+  catch(e) { setSyncDot(''); }
+}
+async function toggleSocial(id) {
+  socialProgress[id] = !socialProgress[id];
+  renderSocial();
+  setSyncDot('busy');
+  try { await apiPost({action:'toggleSocial', id, done: socialProgress[id]}); setSyncDot('ok'); }
+  catch(e) { setSyncDot(''); }
+}
+
+async function loadData() {
+  if (!SCRIPT_URL) {
+    document.getElementById('setupBanner').style.display = 'block';
+    renderAll();
+    return;
+  }
+  setSyncDot('busy');
+  try {
+    const data = await apiGet('getAll');
+    events = data.events || [];
+    trainingProgress = data.training || {};
+    socialProgress = data.social || {};
+    healthEntries = data.health || [];
+    setSyncDot('ok');
+  } catch(e) {
+    setSyncDot('');
+    showToast('לא הצלחתי להתחבר לגיליון');
+  }
+  renderAll();
+}
+
+function renderPhotosLink() {
+  const wrap = document.getElementById('photosLinkWrap');
+  if (photosUrl) {
+    wrap.innerHTML = `<a href="${photosUrl}" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:16px; padding:14px; background:var(--card); border:1px solid var(--line); border-radius:14px; text-decoration:none; color:var(--ink); font-weight:700; font-size:14px;">📸 אלבום התמונות של בובי</a>`;
+  } else {
+    wrap.innerHTML = `<div style="margin-top:16px; padding:12px; background:var(--card); border:1px dashed var(--line); border-radius:14px; font-size:12px; color:#8a8177;">
+      <div style="margin-bottom:6px;">אין עדיין קישור לאלבום Google Photos</div>
+      <input type="text" id="photosUrlInput" placeholder="הדבק כאן קישור לאלבום משותף" style="width:100%; padding:8px; border-radius:8px; border:1px solid var(--line); font-size:12px; direction:ltr; margin-bottom:6px;">
+      <button onclick="savePhotosUrl()" style="width:100%; padding:8px; background:var(--ink); color:var(--cream); border:none; border-radius:8px; font-weight:700; font-size:12px; cursor:pointer;">שמור קישור</button>
+    </div>`;
+  }
+}
+
+function savePhotosUrl() {
+  const url = document.getElementById('photosUrlInput').value.trim();
+  if (!url) return;
+  photosUrl = url;
+  localStorage.setItem('bobby_photos_url', url);
+  renderPhotosLink();
+  showToast('קישור לאלבום נשמר 📸');
+}
+
+const HEALTH_ICONS = {vaccine:'💉', vet:'🩺', medication:'💊', other:'📋'};
+const HEALTH_LABELS = {vaccine:'חיסון', vet:'ביקור וטרינר', medication:'תרופה/טיפול', other:'אחר'};
+
+function formatDateHe(dateStr) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('he-IL', {day:'2-digit', month:'2-digit', year:'numeric'});
+}
+
+function googleCalendarLink(h) {
+  // build an all-day Google Calendar event link (date only, no specific time known)
+  const d = new Date(h.date + 'T00:00:00');
+  const nextDay = new Date(d);
+  nextDay.setDate(nextDay.getDate() + 1);
+  const fmt = (dt) => dt.toISOString().slice(0,10).replace(/-/g,'');
+  const title = encodeURIComponent(`בובי: ${h.title}`);
+  const details = encodeURIComponent(`${HEALTH_LABELS[h.category]||''}${h.notes ? ' — '+h.notes : ''}\nנוסף באפליקציית בובי`);
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${fmt(d)}/${fmt(nextDay)}&details=${details}`;
+}
+
+function renderHealth() {
+  const now = new Date();
+  now.setHours(0,0,0,0);
+
+  const upcoming = healthEntries.filter(h => {
+    const isFuture = h.isFuture === true || h.isFuture === 'TRUE' || h.isFuture === 'true';
+    return isFuture && new Date(h.date) >= now;
+  }).sort((a,b) => new Date(a.date) - new Date(b.date));
+
+  const past = healthEntries.filter(h => {
+    const isFuture = h.isFuture === true || h.isFuture === 'TRUE' || h.isFuture === 'true';
+    return !isFuture || new Date(h.date) < now;
+  }).sort((a,b) => new Date(b.date) - new Date(a.date));
+
+  const upcomingDiv = document.getElementById('healthUpcoming');
+  if (upcoming.length === 0) {
+    upcomingDiv.innerHTML = '<div class="empty-state">אין תזכורות עתידיות כרגע</div>';
+  } else {
+    upcomingDiv.innerHTML = upcoming.map(h => `
+      <div class="log-item">
+        <div class="emoji">${HEALTH_ICONS[h.category]||'📋'}</div>
+        <div class="info"><div class="type">${h.title}</div><div class="meta">${formatDateHe(h.date)} · ${HEALTH_LABELS[h.category]||''}</div></div>
+        <a href="${googleCalendarLink(h)}" target="_blank" style="font-size:11px; font-weight:700; padding:6px 10px; border-radius:10px; background:var(--sky); color:white; text-decoration:none; white-space:nowrap;">📅 ליומן</a>
+        <div class="del" onclick="deleteHealthEntry('${h.id}')">✕</div>
+      </div>`).join('');
+  }
+
+  const historyDiv = document.getElementById('healthHistory');
+  if (past.length === 0) {
+    historyDiv.innerHTML = '<div class="empty-state">אין עדיין היסטוריה</div>';
+  } else {
+    historyDiv.innerHTML = past.map(h => `
+      <div class="log-item">
+        <div class="emoji">${HEALTH_ICONS[h.category]||'📋'}</div>
+        <div class="info"><div class="type">${h.title}</div><div class="meta">${formatDateHe(h.date)}${h.notes ? ' · '+h.notes : ''}</div></div>
+        <div class="who">${h.who||''}</div>
+        <div class="del" onclick="deleteHealthEntry('${h.id}')">✕</div>
+      </div>`).join('');
+  }
+}
+
+async function addHealthEntry() {
+  const title = document.getElementById('healthTitle').value.trim();
+  const category = document.getElementById('healthCategory').value;
+  const date = document.getElementById('healthDate').value;
+  const isFuture = document.getElementById('healthIsFuture').checked;
+  const notes = document.getElementById('healthNotes').value.trim();
+
+  if (!title || !date) { showToast('צריך למלא כותרת ותאריך'); return; }
+  if (!SCRIPT_URL) { showToast('קודם צריך להגדיר חיבור ל-Google Sheet'); return; }
+
+  const entry = {id: 'temp'+Date.now(), title, category, date, isFuture, notes, who: currentWho};
+  healthEntries.push(entry);
+  renderHealth();
+
+  document.getElementById('healthTitle').value = '';
+  document.getElementById('healthDate').value = '';
+  document.getElementById('healthNotes').value = '';
+  document.getElementById('healthIsFuture').checked = false;
+
+  showToast(isFuture ? 'נשמר - לחצו על "ליומן" כדי להוסיף תזכורת 📅' : 'נשמר ✅');
+  setSyncDot('busy');
+  try {
+    const result = await apiPost({action:'addHealth', data: entry});
+    entry.id = result.id;
+    setSyncDot('ok');
+  } catch(e) { setSyncDot(''); showToast('שגיאת סנכרון'); }
+}
+
+async function deleteHealthEntry(id) {
+  healthEntries = healthEntries.filter(h => h.id !== id);
+  renderHealth();
+  setSyncDot('busy');
+  try { await apiPost({action:'deleteHealth', id}); setSyncDot('ok'); }
+  catch(e) { setSyncDot(''); }
+}
+
+function renderAll() {
+  renderAgeBadge();
+  renderHome();
+  renderTraining();
+  renderSocial();
+  renderHealth();
+  renderPhotosLink();
+  setWho(currentWho);
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('view-' + tab.dataset.view).classList.add('active');
+  });
+});
+
+// poll for updates every 15s so both partners see fresh data
+setInterval(() => { if (SCRIPT_URL) loadData(); }, 15000);
+
+loadData();
+</script>
+</body>
+</html>
